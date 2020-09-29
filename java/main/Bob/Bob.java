@@ -62,9 +62,14 @@ public class Bob {
 			while(!finished) {
 				try {
 					String incomingMsg = streamIn.readUTF();
+					// Split it into the message body and message number 
+					String[] pieces = incomingMsg.split(":");
+					String msg = pieces[0];
+					String msgNum = pieces[1];
+
 					System.out.println("Alice says: " + incomingMsg);
 					
-					finished = incomingMsg.equals("done");
+					finished = msg.equals("done");
 				}
 				catch(IOException ioe) {
 					//disconnect if there is an error reading the input

@@ -44,7 +44,7 @@ public class Alice {
 		//obtain server's port number and connect to it
 		int serverPort = Integer.parseInt(malloryPort);
 		String serverAddress = "localhost";
-			
+
 		try{
 			Socket serverSocket = new Socket(serverAddress, serverPort);
 			System.out.println("Connected to Server Mallory");
@@ -53,12 +53,14 @@ public class Alice {
 			//obtain the message from the user and send it to Server
 			//the communication ends when the user inputs "done"
 			String line = "";
+			int counter = 0;
 			while(!line.equals("done")) {
 				try {  
+					counter++;
 					System.out.print("Type message: ");
 					line = console.nextLine();
 					
-					String packagedMsg = packageMessage(line);
+					String packagedMsg = packageMessage(line + ":" + counter);
 					streamOut.writeUTF(packagedMsg);
 					streamOut.flush();
 					System.out.println("Message en route to Bob");

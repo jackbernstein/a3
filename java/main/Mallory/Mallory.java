@@ -51,7 +51,6 @@ public class Mallory {
         String serverAddress = "localhost";
 	
         try {
-
 			// STEP 1: CONNECT TO BOB SERVER TO SEND MESSAGES
 			Socket serverSocket = new Socket(serverAddress, bobPortNumber);
 			System.out.println("Connected to Server Bob");
@@ -69,12 +68,19 @@ public class Mallory {
             boolean finished = false;
 			while(!finished) {
 				try {
-                    // Read message from Alice
+					// Read message from Alice
 					String incomingMsg = streamIn.readUTF();
+					// Split it into the message body and message number 
+					String[] pieces = incomingMsg.split(":");
+					String msg = pieces[0];
+					String msgNum = pieces[1];
+					String packagedMsg = packageMessage(incomingMsg);
 
+					// Save this message 
+					// TODO: Determine which msg to save, body or whole thing
 					history.add(incomingMsg);
 
-					System.out.println("Recieved message -- " + incomingMsg + " -- from Alice");
+					System.out.println("Recieved message -- " + msg + " -- from Alice");
 					System.out.println("Commands: (1) pass message along to Bob, (2) drop the message, or (3) modify the message");
 
 					String line = console.nextLine();
@@ -82,17 +88,21 @@ public class Mallory {
 						case "1":
 							System.out.println("Passing message along to Bob");
 							// Pass message along to Bob
-							String packagedMsg = packageMessage(incomingMsg);
 							streamOut.writeUTF(packagedMsg);
 							streamOut.flush();
+							break;
 						case "2":
 							System.out.println("Dropping message from Alice");
+							break;
 						case "3":
 							System.out.println("Enter a new message to pass instead"); 
+							break;
+						default: 
+							System.out.println("Defaulting to passing the original message to Bob");
+							streamOut.writeUTF(packagedMsg);
+							streamOut.flush();
 					}
-                    
-                    finished = incomingMsg.equals("done");
-
+                    finished = msg.equals("done");
 				}
 				catch(IOException ioe) {
 					//disconnect if there is an error reading the input
