@@ -48,6 +48,10 @@ public class Gen {
             out = new FileOutputStream(outFile + ".pub");
             out.write(alicePublic.getEncoded());
             out.close();
+
+            // System.out.println("Public key format: " + alicePublic.getFormat());
+            // System.out.println("Private key format: " + alicePrivate.getFormat());
+
         }
         catch (IOException e) {
             System.out.println("Error writing keys to files.");

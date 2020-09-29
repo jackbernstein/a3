@@ -1,6 +1,11 @@
 import java.io.*;
 import java.net.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.*;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
@@ -16,6 +21,15 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.KeyGenerator;
 
 public class Mallory {
+
+	// Constants for RSA keys
+	private static String ALICE_PUBLIC_KEY_PATH = "alicePublic.pub";
+	private static String BOB_PUBLIC_KEY_PATH = "bobPublic.pub";
+	private static String PUBLIC_KEY_FORMAT = "X.509";
+
+	//RSA keys 
+	private PublicKey alicePublicKey;
+	private PublicKey bobPublicKey;
     
     //instance variables
     private boolean mac;
@@ -41,7 +55,10 @@ public class Mallory {
 		} else if(config.compareTo("EncThenMac") == 0){
 			mac = true;
 			enc = true;
-        }
+		}
+		
+		// Read in RSA keys 
+		readKeys();
 		
 		System.out.println("This is Mallory");
 		Scanner console = new Scanner(System.in);
@@ -125,6 +142,38 @@ public class Mallory {
 		}
 	}	
 		
+	private void readKeys() {
+		try  {
+			// GENERATE BOB'S PUBLIC KEY
+			/* Read all the public key bytes */
+			Path path = Paths.get(BOB_PUBLIC_KEY_PATH);
+			byte[] bytes = Files.readAllBytes(path);
+
+			/* Generate public key. */
+			X509EncodedKeySpec ks = new X509EncodedKeySpec(bytes);
+			KeyFactory kf = KeyFactory.getInstance("RSA");
+			bobPublicKey = kf.generatePublic(ks);
+
+			// GENERATE ALICE'S PUBLIC KEY
+			/* Read all the public key bytes */
+			path = Paths.get(BOB_PUBLIC_KEY_PATH);
+			bytes = Files.readAllBytes(path);
+
+			/* Generate public key. */
+			ks = new X509EncodedKeySpec(bytes);
+			bobPublicKey = kf.generatePublic(ks);
+		}
+		catch (IOException e) {
+			System.out.println(e.getMessage());
+		} 
+		catch (NoSuchAlgorithmException e) {
+			System.out.println(e.getMessage());
+		} 
+		catch (InvalidKeySpecException e) {
+			System.out.println(e.getMessage());
+		}
+	}
+
 	private String packageMessage(String message) throws Exception {
 		StringBuilder acc = new StringBuilder();
 		acc.append(message);
