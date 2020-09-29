@@ -95,7 +95,9 @@ public class Mallory {
 							System.out.println("Dropping message from Alice");
 							break;
 						case "3":
-							System.out.println("Enter a new message to pass instead"); 
+							System.out.println("Enter a new message to pass instead:"); 
+							line = console.nextLine();
+							
 							break;
 						default: 
 							System.out.println("Defaulting to passing the original message to Bob");
